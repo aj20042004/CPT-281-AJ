@@ -234,7 +234,9 @@ void Vector<T>::sort() {
 		int key = arr[k];
 		int j = k - 1;
 
-		while ((j >= 0) && (key < arr[j])) {
+		while ((j >= 0) && (key < a
+			
+			rr[j])) {
 			arr[j + 1] = arr[j];
 			j--;
 		}
