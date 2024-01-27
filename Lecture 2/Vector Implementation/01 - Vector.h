@@ -167,6 +167,7 @@ const T& Vector<T>::operator [] (size_t index) const { return data[index]; }  //
 template <class T>
 T& Vector<T>::operator [] (size_t index) { return data[index]; }  // Time complexity: O(1)
 
+
 // Constructor with initial size and initial filling value
 template<class T>
 Vector<T>::Vector(size_t initial_size, const T& filling_value) : capacity(max(DEFAULT_CAPACITY, initial_size)), num_of_items(initial_size) {
@@ -186,12 +187,6 @@ Vector<T>::~Vector() {
     if (data) { delete[] data; }
 }
 
-// Copy constructor
-template<class T>
-Vector<T>::Vector(const Vector<T>& other) {
-    data = NULL;
-    *this = other;
-}
 
 // Deep-copy assignment operator
 template<class T>
