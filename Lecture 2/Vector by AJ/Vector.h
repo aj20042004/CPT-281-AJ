@@ -136,13 +136,13 @@ Vector<T>::~Vector() {
 
 template<class T>
 T& Vector<T>::at(size_t index) {
-	if (index >= size()) { throw exception("Index out of bounds"); }
+	if (index < 0 || index >= size()) { throw exception("Index out of bounds"); }
 	return arr[index];
 }
 
 template<class T>
 const T& Vector<T>::at(size_t index) const {
-	if (index >= size()) { throw exception("Index out of bounds"); }
+	if (index < 0 || index >= size()) { throw exception("Index out of bounds"); }
 	return data[index];
 }
 
