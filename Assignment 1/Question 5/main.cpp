@@ -1,7 +1,7 @@
 #include <iostream>
 #include <vector>
 #include <sstream>
-#include "Solution2.h"
+#include "Solution.h"
 
 using namespace std;
 
@@ -26,7 +26,7 @@ int main() {
 
     Solution sol;
 
-    cout << "The Sum is: " << sol.sum_diagonal_elements(matrix_3) << endl;
+    cout << "The Sum is: " << sol.sum_diagonal_elements(matrix) << endl;
 
     return 0;
 }

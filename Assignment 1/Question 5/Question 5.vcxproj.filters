@@ -23,11 +23,5 @@
     <ClInclude Include="Solution.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Solution1.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Solution2.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
   </ItemGroup>
 </Project>
