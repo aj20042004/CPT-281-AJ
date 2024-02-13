@@ -26,7 +26,7 @@ int main() {
 
     Solution sol;
 
-    cout << "The Sum is: " << sol.sum_diagonal_elements(matrix) << endl;
+    cout << "The Sum is: " << sol.sum_diagonal_elements(matrix_3) << endl;
 
     return 0;
 }

@@ -11,7 +11,6 @@ using namespace std;
 // input string: "datastructures"
 // output string: "dtstrctrs"
 
-
 class Solution {
 public:
     /** Removes all the vowels from a string.
@@ -41,10 +40,8 @@ public:
 
         // return the edited string
         return new_string;
-
     }
 };
-
 
 
 #endif

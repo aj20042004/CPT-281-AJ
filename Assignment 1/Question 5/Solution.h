@@ -35,15 +35,13 @@ public:
 
                 // Adding the element from the secondary diagnol
                 sum += matrix[i][row_size - 1 - i];
-            }   
+            }
         }
 
         // returning the sum
         return sum;
     }
 };
-
-
 
 
 #endif
