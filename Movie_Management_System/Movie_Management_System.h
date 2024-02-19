@@ -18,7 +18,8 @@ public:
 	void display_movies();
 	void add_movie(const Movie&);  // adding to the coming list
 	void start_showing_movie(const Date&);
-	void edit_coming_movie(const string&, const Date&, const string&);
+	void edit_coming_movie_releaseDate(const string&, const Date&);
+	void edit_coming_movie_description(const string&, const string&);
 	int count_coming_movies_before_date(const Date&);
 	void save_to_file(const string&);
 	void load_from_file(const string&);
@@ -39,6 +40,7 @@ bool Movie_Management_System::isValidDate(const Date& date) {
 void Movie_Management_System::display_movies() {
 
 	cout << "The Showing Movies: " << endl;
+	cout << "-----------------------" << endl;
 
 	for (list<Movie>::iterator it = showing_list.begin(); it != showing_list.end(); ++it) {
 		cout << it->get_movie_name() << endl;
@@ -71,15 +73,20 @@ void Movie_Management_System::add_movie(const Movie& new_movie) {
 
 
 	cout << "Adding the movie to the list...Please wait!" << endl;
-	
+
 	// Insert the new movie at the found position
 	coming_list.insert(position, new_movie);
-	
+
 	cout << "Movie was successfully added to the list. Thank you!!" << endl;
 
 }
 
 void Movie_Management_System::start_showing_movie(const Date& specified_released_date) {
+
+	if (!isValidDate(specified_released_date)) {
+		cout << "The release date is invalid... Sorry! Try again" << endl;
+		return;
+	}
 
 	for (list<Movie>::iterator it = coming_list.begin(); it != coming_list.end(); ++it) {
 
@@ -98,8 +105,27 @@ void Movie_Management_System::start_showing_movie(const Date& specified_released
 				cout << "The release date is invalid... Sorry! Try again" << endl;
 			}
 
+			cout << endl;
+			cout << "The Movie info: " << endl;
+			cout << "----------------" << endl;
+			cout << "Movie name: " << it->get_movie_name() << endl;
+			cout << "Release date: " << it->get_release_date().get_month() << "/" << it->get_release_date().get_day_of_month() << "/" 
+				<< it->get_release_date().get_year() << endl;
+			cout << "Description: " << it->get_description() << endl;
+			cout << "Receive date: " << it->get_receive_date().get_month() << "/" << it->get_receive_date().get_day_of_month() << "/"
+				<< it->get_receive_date().get_year() << endl;
+			
+			cout << "Status: ";
+			if (it->get_status() == 0) {
+				cout << "received" << endl;
+			}
+			else {
+				cout << "released" << endl;
+			}
+
 			showing_list.push_back(*it);
 			coming_list.erase(it);
+			return;
 
 		}
 	}
@@ -108,12 +134,35 @@ void Movie_Management_System::start_showing_movie(const Date& specified_released
 }
 
 
-void Movie_Management_System::edit_coming_movie(const string& movie_name_to_edit, const Date& new_release_date, const string& new_description) {
+void Movie_Management_System::edit_coming_movie_releaseDate(const string& movie_name_to_edit, const Date& new_release_date) {
 
 	for (list<Movie>::iterator it = coming_list.begin(); it != coming_list.end(); ++it) {
-		
+
 		if (it->get_movie_name() == movie_name_to_edit) {
+
+			if (!isValidDate(new_release_date)) {
+				cout << "The release date is invalid... Sorry! Try again" << endl;
+				return;
+			}
+			
 			it->set_release_date(new_release_date);
+			
+			cout << "Movie information was successfully edited!! Thank you.." << endl;
+			return;
+		}
+	}
+
+	cout << "Sorry! The movie does not exists in the coming lists" << endl;
+}
+
+
+
+void Movie_Management_System::edit_coming_movie_description(const string& movie_name_to_edit, const string& new_description) {
+
+	for (list<Movie>::iterator it = coming_list.begin(); it != coming_list.end(); ++it) {
+
+		if (it->get_movie_name() == movie_name_to_edit) {
+			
 			it->set_description(new_description);
 			cout << "Movie information was successfully edited!! Thank you.." << endl;
 			return;
@@ -123,23 +172,27 @@ void Movie_Management_System::edit_coming_movie(const string& movie_name_to_edit
 	cout << "Sorry! The movie does not exists in the coming lists" << endl;
 }
 
+
+
 int Movie_Management_System::count_coming_movies_before_date(const Date& specified_date) {
 
 	int count = 0;
 
 	if (!isValidDate(specified_date)) {
+		
+		cout << "The release date is invalid... Sorry! Try again" << endl;
 		return count;
 	}
 
 	for (list<Movie>::iterator it = coming_list.begin(); it != coming_list.end(); ++it) {
-		
-		if (it->get_release_date() < specified_date) {
+
+		if (it->get_release_date() <= specified_date) {
 			count += 1;
 		}
 	}
 
 	return count;
-	
+
 }
 
 void Movie_Management_System::save_to_file(const string& output_file_name) {
@@ -152,27 +205,44 @@ void Movie_Management_System::save_to_file(const string& output_file_name) {
 	}
 
 	output_file << "The Showing Movies: " << endl;
+	output_file << " " << endl;
 
 	// showing movies
 	for (list<Movie>::iterator it = showing_list.begin(); it != showing_list.end(); ++it) {
-		output_file << it->get_movie_name() << ", " << it->get_release_date().get_month() << "/"
-			<< it->get_release_date().get_day_of_month() << "/" << it->get_release_date().get_year()
-			<< ", " << it->get_description() << ", " << it->get_receive_date().get_month() << "/"
-			<< it->get_receive_date().get_day_of_month() << "/" << it->get_receive_date().get_year()
-			<< ", " << it->get_status();
+		
+		output_file << it->get_movie_name() << ", " << it->get_release_date().get_month() << "/" << it->get_release_date().get_day_of_month()
+	    << "/" << it->get_release_date().get_year() << ", " << it->get_description() << ", " << it->get_receive_date().get_month() 
+		<< "/" << it->get_receive_date().get_day_of_month() << "/" << it->get_receive_date().get_year() << ", ";
+
+		if (it->get_status() == 0) {
+			output_file << "received" << endl;
+		}
+		else {
+			output_file << "released" << endl;
+		}
+
+		
 	}
 
 	output_file << " " << endl;
 
 	output_file << "The Coming Movies: " << endl;
 
+	output_file << " " << endl;
+
 	// Coming movies
 	for (list<Movie>::iterator it = coming_list.begin(); it != coming_list.end(); ++it) {
-		output_file << it->get_movie_name() << ", " << it->get_release_date().get_month() << "/"
-			<< it->get_release_date().get_day_of_month() << "/" << it->get_release_date().get_year()
-			<< ", " << it->get_description() << ", " << it->get_receive_date().get_month() << "/"
-			<< it->get_receive_date().get_day_of_month() << "/" << it->get_receive_date().get_year()
-			<< ", " << it->get_status();
+		
+		output_file << it->get_movie_name() << ", " << it->get_release_date().get_month() << "/" << it->get_release_date().get_day_of_month()
+		<< "/" << it->get_release_date().get_year() << ", " << it->get_description() << ", " << it->get_receive_date().get_month()
+		<< "/" << it->get_receive_date().get_day_of_month() << "/" << it->get_receive_date().get_year() << ", "; 
+		
+		if (it->get_status() == 0) {
+			output_file << "received" << endl;
+		}
+		else {
+			output_file << "released" << endl;
+		}
 	}
 
 	output_file << " " << endl;
@@ -184,7 +254,7 @@ void Movie_Management_System::save_to_file(const string& output_file_name) {
 
 void Movie_Management_System::load_from_file(const string& input_file_name) {
 
-	string read_line , read_caption;
+	string read_line;
 	ifstream input_file(input_file_name);
 
 	if (!input_file) {
@@ -192,65 +262,59 @@ void Movie_Management_System::load_from_file(const string& input_file_name) {
 		return;
 	}
 
-	input_file >> read_caption;
+	while (getline(input_file, read_line)) {
 
-	if (read_caption == "The Showing Movies: ") {
+		stringstream read_string(read_line);
+		string name_str, release_date_str, description_str, receive_date_str, status_str;
+		Status status;
+		Date obj_release_date;
+		Date obj_receive_date;
 
-		while (getline(input_file, read_line)) {
+		getline(read_string >> ws, name_str, ',');
+		getline(read_string >> ws, release_date_str, ',');
+		getline(read_string >> ws, description_str, ',');
+		getline(read_string >> ws, receive_date_str, ',');
+		getline(read_string >> ws, status_str, ',');
 
-			stringstream read_string(read_line);
-			string name_str, release_date_str, description_str, receive_date_str, status_str;
-			Status status;
-			Date obj_release_date;
-			Date obj_receive_date;
-
-			getline(read_string, name_str, ',');
-			getline(read_string, release_date_str, ',');
-			getline(read_string, description_str, ',');
-			getline(read_string, receive_date_str, ',');
-			getline(read_string, status_str, ',');
-
-			// Changing the string format of status to enum
-			if (status_str == "released") {
-				status = RELEASED;
-			}
-			else {
-				status = RECEIVED;
-			}
-
-			if (obj_release_date.parse_from_string(release_date_str)) {
-				cout << "Successfully loaded the release date" << endl;
-			}
-			else {
-				cout << "Error in parsing the release date" << endl;
-				continue;
-			}
-
-
-			if (obj_receive_date.parse_from_string(receive_date_str)) {
-				cout << "Successfully loaded the receive date" << endl;
-			}
-			else {
-				cout << "Error in parsing the release date" << endl;
-				continue;
-			}
-
-			Movie obj_movie(name_str, obj_release_date, description_str, obj_receive_date, status);
-			if (status == RECEIVED) {
-				coming_list.push_back(obj_movie);
-			}
-			else {
-				showing_list.push_back(obj_movie);
-			}
-
+		// Changing the string format of status to enum
+		if (status_str == "released") {
+			status = RELEASED;
+		}
+		else {
+			status = RECEIVED;
 		}
 
-		input_file.close();
-		cout << " " << endl;
-		cout << "Successfully loaded all the data" << endl;
+		if (obj_release_date.parse_from_string(release_date_str)) {
+			 // Successfully loaded the release date
+		}
+		else {
+			cout << "Error in parsing the release date" << endl;
+			continue;
+		}
+
+
+		if (obj_receive_date.parse_from_string(receive_date_str)) {
+			 // "Successfully loaded the receive date"
+		}
+		else {
+			cout << "Error in parsing the release date" << endl;
+			continue;
+		}
+
+		Movie obj_movie(name_str, obj_release_date, description_str, obj_receive_date, status);
+		if (status == RECEIVED) {
+			coming_list.push_back(obj_movie);
+		}
+		else {
+			showing_list.push_back(obj_movie);
+		}
 
 	}
-	
+
+	input_file.close();
+	cout << " " << endl;
+	// Successfully loaded all the data
+
 }
 
 
