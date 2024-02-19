@@ -174,14 +174,16 @@ int main() {
 		}
 
 		else if (choice_number == 8) {
-			cout << endl;
+			
 			cout << "Thank you" << endl;
 			loop_switch = false;
 		}
 
 	}
 	
-	// Questions: Date logic , time complexity, edit date / description - can I use movie name to search , valid date ? 
+	// Questions: Date logic , time complexity, edit date / description - can I use movie name to search , valid date ?
+	//, Is coming movies - status = received, Is showing movies - status = released ?, while coming the movie from coming list to
+	// showing list, do we need to change status ?
 
 	system("pause");
 	return 0;

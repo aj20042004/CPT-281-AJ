@@ -40,11 +40,20 @@ bool Movie_Management_System::isValidDate(const Date& date) {
 void Movie_Management_System::display_movies() {
 
 	cout << "The Showing Movies: " << endl;
-	cout << "-----------------------" << endl;
+	cout << "-------------------" << endl;
 
 	for (list<Movie>::iterator it = showing_list.begin(); it != showing_list.end(); ++it) {
 		cout << it->get_movie_name() << endl;
 	}
+
+	cout << " " << endl;
+	cout << "The Coming Movies: " << endl;
+	cout << "-------------------" << endl;
+
+	for (list<Movie>::iterator it = coming_list.begin(); it != coming_list.end(); ++it) {
+		cout << it->get_movie_name() << endl;
+	}
+
 }
 
 void Movie_Management_System::add_movie(const Movie& new_movie) {
@@ -67,15 +76,14 @@ void Movie_Management_System::add_movie(const Movie& new_movie) {
 		}
 	}
 
-	auto position = std::find_if(coming_list.begin(), coming_list.end(), [&](const Movie& movie) {
-		return movie.get_release_date() > new_movie.get_release_date();
-		});
-
-
 	cout << "Adding the movie to the list...Please wait!" << endl;
 
-	// Insert the new movie at the found position
-	coming_list.insert(position, new_movie);
+	if (new_movie.get_status() == RECEIVED) {
+		coming_list.push_back(new_movie);
+	}
+	else {
+		showing_list.push_back(new_movie);
+	}
 
 	cout << "Movie was successfully added to the list. Thank you!!" << endl;
 
@@ -250,6 +258,7 @@ void Movie_Management_System::save_to_file(const string& output_file_name) {
 	output_file.close();
 
 	cout << "successfully saved the data to the file " << output_file_name << endl;
+	cout << endl;
 }
 
 void Movie_Management_System::load_from_file(const string& input_file_name) {
