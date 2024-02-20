@@ -20,7 +20,8 @@ public:
 	void start_showing_movie(const Date&);
 	void edit_coming_movie_releaseDate(const string&, const Date&);
 	void edit_coming_movie_description(const string&, const string&);
-	int count_coming_movies_before_date(const Date&);
+	int  count_coming_movies_before_date(const Date&);
+	void sort_coming_movies_release_date(); // Need to implement this
 	void save_to_file(const string&);
 	void load_from_file(const string&);
 
@@ -64,7 +65,7 @@ void Movie_Management_System::add_movie(const Movie& new_movie) {
 	}
 
 	if (new_movie.get_release_date() <= new_movie.get_receive_date()) {
-		cout << "Release date cannot be earlier or equal to the receive data" << endl;
+		cout << "Release date cannot be earlier or equal to the receive data !! Try again ..." << endl;
 		return;
 	}
 
@@ -125,10 +126,12 @@ void Movie_Management_System::start_showing_movie(const Date& specified_released
 			
 			cout << "Status: ";
 			if (it->get_status() == 0) {
-				cout << "received" << endl;
+				Status status = RELEASED;
+				it->set_status(status);
+				cout << "released" << endl;
 			}
 			else {
-				cout << "released" << endl;
+				cout << "received" << endl;
 			}
 
 			showing_list.push_back(*it);
@@ -138,7 +141,7 @@ void Movie_Management_System::start_showing_movie(const Date& specified_released
 		}
 	}
 
-	cout << "Cannot find any movies that matches the specified date" << endl;
+	cout << "Cannot find any movies that matches the specified date!! Try again ..." << endl;
 }
 
 

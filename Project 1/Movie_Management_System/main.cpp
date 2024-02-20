@@ -50,7 +50,7 @@ int main() {
 			Status status;
 			
 			cout << "Please enter a movie name to add: ";
-			cin >> movie_name_str;  // Need to read the entire line
+			getline(cin >> ws, movie_name_str); 
 			cout << endl;
 
 			cout << "Please enter a release date (format: MM/DD/YYYY - 01/09/2023) to add: ";
@@ -58,14 +58,14 @@ int main() {
 			cout << endl;
 
 			cout << "Please enter a description to add: ";
-			cin >> description_str;
+			getline(cin >> ws, description_str);
 			cout << endl;
 
 			cout << "Please enter a receive date (format: MM/DD/YYYY - 01/09/2023) to add: ";
 			cin >> receive_date_str;
 			cout << endl;
 
-			cout << "Please enter a status to add: ";
+			cout << "Please enter a status (released/received) to add: ";
 			cin >> status_str;
 			cout << endl;
 
@@ -106,7 +106,7 @@ int main() {
 			Date edit_new_release_date;
 
 			cout << "Enter the movie name to edit: ";
-			cin >> edit_movie_name;
+			getline(cin >> ws, edit_movie_name);
 			cout << endl;
 
 			cout << "Enter the new release date (format: MM/DD/YYYY - 01/09/2023) to change: ";
@@ -126,11 +126,11 @@ int main() {
 			string edit_movie_name, edit_new_description;
 
 			cout << "Enter the movie name to edit: ";
-			cin >> edit_movie_name; // read the line
+			getline(cin >> ws, edit_movie_name);
 			cout << endl;
 
 			cout << "Enter the new description to change: ";
-			cin >> edit_new_description;
+			getline(cin >> ws, edit_new_description);
 			cout << endl;
 
 			movie_mange_system_obj.edit_coming_movie_description(edit_movie_name, edit_new_description);
@@ -145,6 +145,7 @@ int main() {
 
 			cout << "Enter the specified release date (format: MM/DD/YYYY - 01/09/2023) to display the movies: " << endl;
 			cin >> specified_release_date_str;
+			cout << endl;
 		
 			specified_release_date.parse_from_string(specified_release_date_str);
 
@@ -179,9 +180,14 @@ int main() {
 			loop_switch = false;
 		}
 
+		else {
+			cout << "Invalid Option number!!! Please Try again..." << endl;
+			cout << endl;
+		}
+
 	}
 	
-	// Questions: Date logic , time complexity, edit date / description - can I use movie name to search , valid date ?
+	// Questions: Date logic , time complexity, edit date / description - can I use movie name to search , valid date ? ( Invalid ok ?)
 	//, Is coming movies - status = received, Is showing movies - status = released ?, while coming the movie from coming list to
 	// showing list, do we need to change status ?
 
