@@ -113,10 +113,17 @@ int precedence(const string& oper) {
 string infix_to_postfix(const string& infix_exp) {
     istringstream iss(infix_exp);
     ostringstream oss;
+    string postfix;
     List_Stack<string> stk;
     string token;
     while (iss >> token) {
-        if (isdigit(token.front())) { oss << ' ' << token; }
+        if (isdigit(token.front())) {
+            for (string::const_iterator it = token.begin(); it != token.end(); it++) {
+                postfix.push_back(*it);
+            }
+            stk.pop();
+
+        }
         else if (token == "(") { stk.push(token); }
         else if (token == ")") {
             while (stk.top() != "(") {
@@ -125,7 +132,7 @@ string infix_to_postfix(const string& infix_exp) {
             }
             stk.pop();
         } else {
-            while (!stk.empty() && stk.top() != "(" && precedence(token) >= precedence(stk.top())) {
+            while (!stk.empty() && stk.top() != "(" && precedence(token) <= precedence(stk.top())) {
                 oss << ' ' << stk.top();
                 stk.pop();
             }
