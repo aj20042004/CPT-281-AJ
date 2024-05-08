@@ -1,0 +1,243 @@
+////////////////////////////////////////////////////
+// Begin CoursEval Popup                           //
+////////////////////////////////////////////////////
+/*
+ Real time survey assignment notification for the MyCoursEval LMS Dashboard
+*/
+try {
+
+  var alertShown = sessionStorage.getItem('myceshown');
+
+  if ((alertShown !== "yes") && (location.pathname.match(/\/courses\/\d+/))) {
+    sessionStorage.setItem('myceshown','yes');
+    $.get("/api/v1/users/self/profile", function(profile) {
+      var userName = profile.login_id;
+      var checkurl = "https://p19.courseval.net/etw/ets/et.asp?nxappid=R10&nxmid=getsurveycount&uid=" + userName;
+      /*uncomment to verify username is as expected*/
+      /*XSSuserName);*/
+      $.getJSON(checkurl, function (result) {
+        var lcMessage = "" ;
+        if (result!==0) {
+          lcMessage="You have " + result + " evaluation(s) to complete. Please click the MyCoursEval link in the Courses menu to access your evaluations.";
+          $('<div>').prop('id', '_currentDialog').text(lcMessage).dialog(
+            {
+              title: "MyCoursEval Reminder",
+              dialogClass: "alert-info",
+              close: function () {
+                $('#_currentDialog').remove();
+                }
+            });
+          }
+      });
+    });
+  }
+}
+catch(err) {
+  console.log('error in MyCourseEval script: ' + err.message);
+}
+////////////////////////////////////////////////////
+// End CoursEval Popup                            //
+////////////////////////////////////////////////////
+
+////////////////////////////////////////////////////
+// DESIGNPLUS CONFIG                            //
+////////////////////////////////////////////////////
+// Legacy
+var DT_variables = {
+        iframeID: '',
+        // Path to the hosted USU Design Tools
+        path: 'https://designtools.ciditools.com/',
+        templateCourse: '21176',
+        // OPTIONAL: Button will be hidden from view until launched using shortcut keys
+        hideButton: true,
+    	 // OPTIONAL: Limit by course format
+	     limitByFormat: false, // Change to true to limit by format
+	     // adjust the formats as needed. Format must be set for the course and in this array for tools to load
+	     formatArray: [
+            'online',
+            'on-campus',
+            'blended'
+        ],
+        // OPTIONAL: Limit tools loading by users role
+        limitByRole: false, // set to true to limit to roles in the roleArray
+        // adjust roles as needed
+        roleArray: [
+            'student',
+            'teacher',
+            'admin'
+        ],
+        // OPTIONAL: Limit tools to an array of Canvas user IDs
+        limitByUser: false, // Change to true to limit by user
+        // add users to array (Canvas user ID not SIS user ID)
+        userArray: [
+            '1234',
+            '987654'
+        ]
+};
+
+// New
+DpPrimary = {
+    lms: 'canvas',
+    templateCourse: '42160',
+    hideButton: false,
+    hideLti: false,
+    extendedCourse: '', // added in sub-account theme
+    sharedCourse: '', // added from localStorage
+    courseFormats: [],
+    canvasRoles: [],
+    canvasUsers: [],
+    canvasCourseIds: [],
+    plugins: [],
+    excludedModules: [],
+    includedModules: [],
+    lang: 'en',
+    defaultToLegacy: true,
+    enableVersionSwitching: true,
+    hideSwitching: false,
+}
+
+// merge with extended/shared customizations config
+DpConfig = { ...DpPrimary, ...(window.DpConfig ?? {}) }
+
+$(function () {
+    const uriPrefix = (location.href.includes('.beta.')) ? 'beta.' : '';
+    const toolsUri = (DpConfig.toolsUri) ? DpConfig.toolsUri : `https://${uriPrefix}designplus.ciditools.com/`;
+    $.getScript(`${toolsUri}js/controller.js`);
+});
+////////////////////////////////////////////////////
+// END DESIGNPLUS CONFIG                        //
+////////////////////////////////////////////////////
+///////////////////////////////////////////////////
+// BEGIN SYLLABUS PAGE ACTION                    // 
+//////////////////////////////////////////////////
+(function() {
+     'use strict';
+     if (/^\/courses\/\d+\/assignments\/syllabus/.test(window.location.pathname)) {
+          const syllabuslinks = {
+               default_days: 7, // default if the user didn't set data-days
+          };
+          syllabuslinks.remove = () => {
+               // remove the whole assignments container
+               let assignments = document.getElementById('syllabusContainer');
+               assignments.parentNode.removeChild(assignments);
+          };
+          syllabuslinks.disable = () => {
+               let links = document.querySelectorAll('#syllabusContainer tr.syllabus_assignment td a');
+               links.forEach(function(link) {
+                    // set the content of the cell to the text of the Link, removing the link
+                    link.parentNode.textContent = link.textContent;
+               });
+          };
+          syllabuslinks.dates = (days) => {
+               let dates = document.querySelectorAll('#syllabusContainer tr.date td.dates > span');
+               let date_now = Date.now();
+               dates.forEach(function(date) {
+                    let due_date = Date.parse(date.dataset.htmlTooltipTitle);
+                    let total_days = Math.round((due_date - date_now) / (1000 * 60 * 60 * 24));
+                    if (total_days > days) {
+                         let assignment_tr = date.parentNode.parentNode;
+                         let link = assignment_tr.childNodes[3].firstElementChild;
+                         link.parentNode.textContent = link.textContent;
+                    }
+               });
+          };
+          syllabuslinks.action = () => {
+               var trigger = document.getElementById('syllabus-links');
+               if (trigger) {
+                    let action = trigger.textContent;
+                    switch (action) {
+                    case 'remove':
+                         syllabuslinks.remove();
+                         break;
+                    case 'disable':
+                         syllabuslinks.disable();
+                         break;
+                    case 'dates':
+                         var days = typeof trigger.dataset.days !== 'undefined'
+                              ? trigger.dataset.days :
+                                   syllabuslinks.default_days;
+                         syllabuslinks.dates(days);
+                         break;
+                    default:
+                         console.log('syllabus-links command-not-recognized');
+                    }
+               }
+          }
+          syllabuslinks.init = () => {
+               var mcb = function() {
+                    var findAssignments = document.getElementById('syllabusContainer');
+                    if (findAssignments) {
+                         syllabuslinks.action();
+                         observer.disconnect();
+                    }
+               };
+               var syllabusContainer = document.getElementById('syllabusContainer');
+               var observer = new MutationObserver(mcb);
+               observer.observe(syllabusContainer, { childList: true, subtree: true });
+          };
+          syllabuslinks.init();
+     }
+})();
+///////////////////////////////////////////////////
+// END SYLLABUS PAGE ACTION                      // 
+//////////////////////////////////////////////////
+
+//////////////////////////////////////////////////
+// BEGIN ADD ICON TO GLOBAL NAVIGATION          //
+//////////////////////////////////////////////////
+var addMenuButton = function(title, url, img) {
+  var id_title = 'global_nav_custom_' + title.replace(/\s/, '_').toLowerCase();
+
+  var button = $('<li class="custom-menu ic-app-header__menu-list-item" id="'+id_title+'_menu">' +
+    '<a id="'+id_title+'" href="'+url+'" class="ic-app-header__menu-list-link">' +
+      '<div class="menu-item-icon-container" aria-hidden="true"><span class="menu-item__badge" style="display: none">'+title+'</span><span class="svg-holder"></span></div>' +
+      '<div class="menu-item__text">' + title + '</div>' +
+    '</a>' +
+  '</li>');
+
+  button.find('.svg-holder').load(img, function(){
+      var svg = $(this).find('svg')[0];
+      try {
+          svg.classList.add('ic-icon-svg', 'ic-icon-svg--apps ic-icon-svg-ccsd');
+      }
+      catch (e) {
+          svg.setAttribute('class', 'ic-icon-svg ic-icon-svg--apps ic-icon-svg-ccsd');
+      }
+
+      $('#'+id_title+'_menu').remove();
+      $('#menu .menu-item:last').after(button);
+  });
+};
+
+addMenuButton(
+    "Register Now",
+    "https://sccconnection.stchas.edu/Student/Planning",
+    "https://raw.githubusercontent.com/Chkay/SCC/master/yellowclock.svg"
+  );
+////////////////////////////////////////////////////
+// END ADD ICON TO GLOBAL NAVIGATION             //
+//////////////////////////////////////////////////
+
+////////////////////////////////////////////////////
+// Begin Hide Change default email address change //
+////////////////////////////////////////////////////
+// UOFA JIRA MUT-455 : Disable end user ability to change default email address
+$(".channel:not(.default)>.email_meta").html("");
+
+// UOFA JIRA MUT-483 : Maintain email configuration in Canvas
+
+$("select#default_email_id option:not(:selected)").remove();
+
+////////////////////////////////////////////////////
+// End Hide Change default email address change   //
+////////////////////////////////////////////////////
+
+///////////////////////////////////////////////////
+// Begin Hide Pronoun Selections                 //
+//////////////////////////////////////////////////
+
+document.getElementById("user_pronouns").disabled = true;
+
+///////////////////////////////////////////////////
+// Begin Hide Pronoun Selections                 //
+//////////////////////////////////////////////////
